@@ -6,15 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://example.com">
-  <title>Archives | Hexo</title>
+  <title>Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
+  <meta name="description" content="2022.7.19BLE   蓝牙低功耗，数据是怎样组织的？ 蓝牙平台支持  现在大多数的平台支持蓝牙4.0和蓝牙低功耗 包括：IOS5+ Android 4.3+（numerous bug fixes in 4.4+） Apple OS X 10.6 Windows 8 GNU&#x2F;LinuxVanilla BlueZ 4.93+    GAP(Generic Access Profile">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/archives/index.html">
+<meta property="og:url" content="http://example.com/2022/08/20/%E4%BD%8E%E5%8A%9F%E8%80%97%E8%93%9D%E7%89%99%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="2022.7.19BLE   蓝牙低功耗，数据是怎样组织的？ 蓝牙平台支持  现在大多数的平台支持蓝牙4.0和蓝牙低功耗 包括：IOS5+ Android 4.3+（numerous bug fixes in 4.4+） Apple OS X 10.6 Windows 8 GNU&#x2F;LinuxVanilla BlueZ 4.93+    GAP(Generic Access Profile">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="c:/Users/BELON/AppData/Roaming/Typora/typora-user-images/image-20220719104913583.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0452822478a0473bb8868fbeac2c2688.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5oiR5piv6bmP6ICB5biI,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-08-20T07:01:15.711Z">
+<meta property="article:modified_time" content="2022-07-21T03:17:02.000Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:/Users/BELON/AppData/Roaming/Typora/typora-user-images/image-20220719104913583.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,223 +157,250 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-低功耗蓝牙的基本概念" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="2022-7-19"><a href="#2022-7-19" class="headerlink" title="2022.7.19"></a>2022.7.19</h1><p>BLE   蓝牙低功耗，数据是怎样组织的？</p>
+<p>蓝牙平台支持</p>
+<ul>
+<li>现在大多数的平台支持蓝牙4.0和蓝牙低功耗<ul>
+<li>包括：IOS5+</li>
+<li>Android 4.3+（numerous bug fixes in 4.4+）</li>
+<li>Apple OS X 10.6</li>
+<li>Windows 8</li>
+<li>GNU&#x2F;LinuxVanilla BlueZ 4.93+</li>
+</ul>
+</li>
+</ul>
+<h2 id="GAP-Generic-Access-Profile"><a href="#GAP-Generic-Access-Profile" class="headerlink" title="GAP(Generic Access Profile)"></a>GAP(Generic Access Profile)</h2><ul>
+<li>主要控制 蓝牙的连接和广播</li>
+<li>GAP让你的设备能让外界识别到，并决定两个设备是否能交互</li>
+<li>设备角色，GAP决定了设备的多种角色，最重要的 Central devices and Peripheral devices<ul>
+<li>外围设备，小型，低功耗，设备的资源可以连接到比它更强的主设备</li>
+<li>主设备就是手机或平板，有更强的处理记忆能力。</li>
+</ul>
+</li>
+</ul>
+<p>广播和扫描应答</p>
+<ul>
+<li>在GAP中外围设备通过两种方式向外广播数据：Advertising Data Payload（广播数据）和Scan Response Data Payload（扫描回复），每种数据最长可以包含31byte。这里<strong>广播数据是必须的</strong>，因为外设必需不停的向外广播，让中心设备知道它们的存在。<strong>扫描回复是可选的</strong>，中心设备可以向外设请求扫描回复，这里包含一些设备额外的信息，例如设备的名字。</li>
+</ul>
+<p>广播流程</p>
+<ul>
+<li><p><strong>外围设备</strong>会设定一个广播间隔(APP_ADV_INTERVAL)，每个广播间隔中，他会重新发送自己的广播数据，广播间隔越长，越省电，同时也不太容易扫描到。</p>
+</li>
+<li><p>Broadcast Network Topology（广播的网络拓扑结构）</p>
+<ul>
+<li><p>大部分的设备广播自己，连接，建立GATT服务，数据得以传输，这种情况出现在当你需要广播数据的时候</p>
+</li>
+<li><p>一对多，广播数据包</p>
+</li>
+<li><p>一旦建立了外围与中心设备的连接，广播进程就会停止，你通常不再能够发送广播包，你将会使用<strong>GATT服务</strong>和特性</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="GATT（Generic-Attribute-Profile）协议"><a href="#GATT（Generic-Attribute-Profile）协议" class="headerlink" title="GATT（Generic Attribute Profile）协议"></a>GATT（Generic Attribute Profile）协议</h2><p>GATT是一个在蓝牙连接之上的发送和接收很短的数据段的通用规范，这些很短的数据被称为属性（Attribute）</p>
+<ul>
+<li><p>Service 和 Characteristic进行通信</p>
+</li>
+<li><p>Atttibute Protocol（ATT）</p>
+</li>
+<li><p>GATT连接是独占的，也就是一个BLE外设同时只能被一个中心设备连接，一旦外设被连接，他就会马上停止广播，这样它对其他设备不可见了。当设备断开，它又开始广播。</p>
+</li>
+<li><p>中心设备和外设需要双向通信的话，唯一的方式就是建立GATT连接。</p>
+</li>
+</ul>
+<p>GATT结构 包含 <strong>Profiles，Services Characteristic</strong></p>
+<ul>
+<li><img src="C:\Users\BELON\AppData\Roaming\Typora\typora-user-images\image-20220719104913583.png" alt="image-20220719104913583"></li>
+<li>Profile 非实际存在于BLE外设上</li>
+<li>Service 把数据分成一个个的独立逻辑项，每个service有一个UUID唯一标识，UUID有16bit，或者128bit。</li>
+<li>Characterisitic 在GATT事务中最低级别，它也有UUID唯一标识，免费使用Bluetooth SIG官方定义的标准Characteristic，确保软件和硬件能够相互理解。自定义的标识只有你自己的软件和外设能够相互理解。</li>
+<li>BLE外设打交道，主要是通过Characteristic，可以自己设置类似串口的sevice，配置只读，另一个配置为只写。</li>
+</ul>
+<h1 id="2022-7-20"><a href="#2022-7-20" class="headerlink" title="2022.7.20"></a>2022.7.20</h1><ul>
+<li>蓝牙设备中，存在着物理地址，蓝牙<strong>MAC</strong>地址，这个地址是唯一的，就像咱们网络上的IP地址。同时还纯在这一个叫做<strong>UUID</strong>的东西，可以理解为是IP地址中的端口号，就知道了怎么链接到目标网络服务器位置，知道了蓝牙设备的MAC地址和UUID也就能够确定到具体哪一台蓝牙设备了，这两者结合起来就是<strong>蓝牙唯一身份标识</strong>。</li>
+</ul>
+<h1 id="2022-7-21"><a href="#2022-7-21" class="headerlink" title="2022.7.21"></a>2022.7.21</h1><ul>
+<li><p><img src="https://img-blog.csdnimg.cn/0452822478a0473bb8868fbeac2c2688.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5oiR5piv6bmP6ICB5biI,size_20,color_FFFFFF,t_70,g_se,x_16" alt="img"></p>
+</li>
+<li><p><strong>可连接的非定向广播</strong>：Connectable Undirected Event Type</p>
+<ul>
+<li><strong>最常用</strong>的广播方式，可以被扫描，可以被连接。被连接后将进入连接状态</li>
+</ul>
+</li>
+<li><p>可连接的定向广播</p>
+</li>
+<li><p>不可连接的非定向广播</p>
+<ul>
+<li>仅发送广播数据，而不能被扫描或者连接。</li>
+</ul>
+</li>
+<li><p>（不可连接）可扫描的非定向广播</p>
+</li>
+</ul>
+<p>蓝牙状态机</p>
+<ul>
+<li>就绪态，广播态，链接态，扫描态，发起链接态</li>
+</ul>
+<p><strong>蓝牙服务和特性的创建</strong></p>
+<ul>
+<li>蓝牙设备要在进入广播态之前创建服务和特性，<ul>
+<li>创建要使用的UUID；</li>
+<li>使用UUID创建特性并设置特性的读写权限</li>
+<li>将创建好的特性添加到服务集合中</li>
+<li>将服务集合注册到协议栈中</li>
+</ul>
+</li>
+</ul>
+<p><strong>数据交互</strong>  Read Write Notify</p>
+<ul>
+<li>低功耗蓝牙之间的数据交互都是基于<strong>特性</strong><ul>
+<li>以手机连接蓝牙模块为例，手机<strong>读取</strong>蓝牙模块的<strong>数据</strong>，使用的是<strong>Read</strong>方法，手机<strong>发送数据</strong>给蓝牙模块使用的是<strong>Write</strong>方法，蓝牙模块<strong>发送数据</strong>到手机，一般是用的是Notify方法，而且手机端还要打开Notify监听</li>
+</ul>
+</li>
+</ul>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2022" class="archive-year">2022</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/08/20/%E5%8D%9A%E9%80%9A%E9%9B%86%E6%88%90/" class="archive-article-date">
-  	<time datetime="2022-08-20T07:01:15.711Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-08-20</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://example.com/2022/08/20/%E4%BD%8E%E5%8A%9F%E8%80%97%E8%93%9D%E7%89%99%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/08/20/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" class="archive-article-date">
-  	<time datetime="2022-08-20T07:01:15.711Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-08-20</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/08/20/%E7%BA%A2%E5%A4%96%E7%BA%BFNEC%E5%8D%8F%E8%AE%AE/" class="archive-article-date">
-  	<time datetime="2022-08-20T07:01:15.711Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-08-20</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
+<nav id="article-nav">
+  
+    <a href="/2022/08/20/%E7%BA%A2%E5%A4%96%E7%BA%BFNEC%E5%8D%8F%E8%AE%AE/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2022/08/20/%E8%BD%AF%E4%BB%B6%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/08/20/%E4%BD%8E%E5%8A%9F%E8%80%97%E8%93%9D%E7%89%99%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" class="archive-article-date">
-  	<time datetime="2022-08-20T07:01:15.711Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-08-20</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
 
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/08/20/%E8%BD%AF%E4%BB%B6%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" class="archive-article-date">
-  	<time datetime="2022-08-20T07:01:15.711Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-08-20</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
+        
+        
+    </div>
+</aside>
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/08/20/SDK/" class="archive-article-date">
-  	<time datetime="2022-08-20T07:01:15.709Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-08-20</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/08/20/C%E8%AF%AD%E8%A8%80/" class="archive-article-date">
-  	<time datetime="2022-08-20T07:01:15.707Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-08-20</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/08/20/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/" class="archive-article-date">
-  	<time datetime="2022-08-20T01:17:49.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-08-20</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2022/08/20/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/">我的第一篇博客文章</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/08/20/hello-world/" class="archive-article-date">
-  	<time datetime="2022-08-20T01:14:02.043Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-08-20</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2022/08/20/hello-world/">Hello World</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
 
 
           </div>
@@ -389,8 +423,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
